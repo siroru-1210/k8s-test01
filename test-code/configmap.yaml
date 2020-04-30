@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentd-config
+  labels:
+    k8s-app: fluentd-s3
+data:
+  fluent.conf: |
+    #ファイル収集元
+    <source>
+      @type tail
+      path /var/log/messages
+      tag td.messages
+      pos_file /var/log/td-agent/messages.pos
+      format syslog
+    </source>
+    <match td.messages>
+#     @type s3
+#     aws_key_id [[YOUR KEY]]
+#     aws_sec_key [[YOUR SECRET KEY]]
+#     s3_bucket [[YOUR BUCKET NAME]]
+#     s3_region [[YOUR REGION]]
+#     path "#{ENV['NODE_NAME']}/messages"
+#     time_slice_format %Y%m%d/%H%M
+    </match>
+

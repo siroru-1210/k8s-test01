@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd-s3-ds
+spec:
+  selector:
+    matchLabels:
+      k8s-app: fluentd-s3
+  template:
+    metadata:
+      labels:
+        k8s-app: fluentd-s3
+    spec:
+      # https://github.com/fluent/fluentd-kubernetes-daemonset/issues/90
+      initContainers:
+      - name: copy-fluentd-config
+      #  ベースイメージを指定する。
+        image: websphere-liberty
+        #command: ['sh', '-c', 'cp /config-volume/..data/* /fluentd/etc']
+        volumeMounts:
+        - name: config-volume
+          mountPath: /config-volume
+        - name: fluentdconf
+          mountPath: /fluentd/etc
+      containers:
+      - name: fluentd-s3
+        image: nishipy/fluentd-s3:latest
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        resources:
+          limits:
+            cpu: 100m
+            memory: 200Mi
+        volumeMounts:
+        - name: config-volume
+          mountPath: /config-volume
+        - name: fluentdconf
+          mountPath: /fluentd/etc
+        - name: varlog
+          mountPath: /var/log
+      volumes:
+      - name: config-volume
+        configMap:
+          name: fluentd-config
+      - name: fluentdconf
+        emptyDir: {}
+      - name: varlog
+        hostPath:
+          path: /var/log

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: liberty
+  labels:
+    app: liberty
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: liberty
+  template:
+    metadata:
+      labels:
+        app: liberty
+    spec:
+      containers:
+      - name: liberty
+        image: websphere-liberty
+        #imagePullPolicy: Never
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+
